@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: classpath:db/changelog/changes/1_create_users.yml

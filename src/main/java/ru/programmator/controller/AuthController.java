@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.programmator.dto.BaseResponse;
 import ru.programmator.model.User;
+import ru.programmator.repository.UserRepository;
 import ru.programmator.service.UserService;
 
 @RestController
@@ -21,6 +22,7 @@ import ru.programmator.service.UserService;
 public class AuthController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Operation(summary = "Register a new user", description = "Регистрация нового пользователя с предоставлением всех необходимых данных.")
     @ApiResponses(value = {
