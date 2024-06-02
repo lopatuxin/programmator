@@ -25,7 +25,7 @@ class AuthControllerTest {
     private UserService userService;
 
     @Test
-    void testRegister() throws Exception {
+    void when_register_than_success() throws Exception {
         User user = new User();
         user.setUsername("testuser");
         user.setPassword("password");
@@ -39,17 +39,21 @@ class AuthControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser", roles = "USER")
+    void when_register_than_badRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"anton@mail.ru\"}")
+                        .with(csrf()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "Антон", roles = "USER")
     void testLogin() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("password");
-        user.setEmail("test@example.com");
-        userService.register(user);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\", \"password\":\"password\"}")
+                        .content("{\"username\":\"Антон\", \"password\":\"password\"}")
                         .with(csrf()))
                 .andExpect(status().isOk());
     }

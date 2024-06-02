@@ -7,13 +7,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.programmator.dto.BaseResponse;
+import ru.programmator.exception.UserRegistrationException;
 import ru.programmator.model.User;
-import ru.programmator.repository.UserRepository;
 import ru.programmator.service.UserService;
 
 @RestController
@@ -22,7 +20,6 @@ import ru.programmator.service.UserService;
 public class AuthController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @Operation(summary = "Register a new user", description = "Регистрация нового пользователя с предоставлением всех необходимых данных.")
     @ApiResponses(value = {
@@ -44,6 +41,14 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .message("Пользователь успешно зарегестрирован")
                 .build();
+    }
+
+    @ExceptionHandler(UserRegistrationException.class)
+    public ResponseEntity<BaseResponse<Object>> handleUserRegistrationException(UserRegistrationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(ex.getMessage())
+                .build());
     }
 
     @PostMapping("/login")
