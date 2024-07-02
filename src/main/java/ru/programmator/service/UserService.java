@@ -19,6 +19,10 @@ public class UserService {
             throw new UserRegistrationException("Email уже зарегистрирован");
         }
 
+        if (userRepository.existsByPhone(user.getPhone())) {
+            throw new UserRegistrationException("Телефон уже зарегистрирован");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }

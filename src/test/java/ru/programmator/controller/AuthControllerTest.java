@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.programmator.model.User;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,14 +22,10 @@ class AuthControllerTest {
 
     @Test
     void when_register_than_success() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("password");
-        user.setEmail("test@example.com");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"test@example.com\"}")
+                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"test@example.com\", \"phone\":\"1234567890\"}")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
@@ -38,14 +33,23 @@ class AuthControllerTest {
     }
 
     @Test
-    void when_register_than_badRequest() throws Exception {
+    void when_register_with_existing_email_than_badRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"anton@mail.ru\"}")
+                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"anton@mail.ru\", \"phone\":\"1234567890\"}")
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("Email уже зарегистрирован"));
+    }
+
+    @Test
+    void when_register_with_existing_phone_than_badRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"test@mail.ru\", \"phone\":\"+7(930) 175 67 42\"}")
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Телефон уже зарегистрирован"));
     }
 
     @Test

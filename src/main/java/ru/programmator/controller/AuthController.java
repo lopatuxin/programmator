@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.programmator.dto.BaseResponse;
+import ru.programmator.dto.auth.UserDTO;
 import ru.programmator.model.User;
 import ru.programmator.service.UserService;
 
@@ -35,7 +36,15 @@ public class AuthController {
                             schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/register")
-    public BaseResponse<Object> register(@RequestBody User user) {
+    public BaseResponse<Object> register(@RequestBody UserDTO userDTO) {
+        User user = User.builder()
+                .firstName(userDTO.getFirstName())
+                .lastName(userDTO.getLastName())
+                .password(userDTO.getPassword())
+                .email(userDTO.getEmail())
+                .phone(userDTO.getPhone())
+                .build();
+
         userService.register(user);
 
         return BaseResponse.builder()
