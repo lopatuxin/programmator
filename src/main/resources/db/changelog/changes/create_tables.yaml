@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: classpath:db/changelog/changes/1_create_users.yml
+  - include:
+      file: classpath:db/changelog/changes/2_create_roles.yml
+  - include:
+      file: classpath:db/changelog/changes/3_create_user_roles.yml
