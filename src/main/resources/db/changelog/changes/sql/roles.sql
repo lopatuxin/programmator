@@ -1,6 +1,6 @@
-INSERT INTO user_roles (name)
+INSERT INTO roles (name)
 VALUES ('ROLE_USER');
-INSERT INTO user_roles (name)
+INSERT INTO roles (name)
 VALUES ('ROLE_ADMIN');
-INSERT INTO user_roles (name)
+INSERT INTO roles (name)
 VALUES ('ROLE_MANAGER');

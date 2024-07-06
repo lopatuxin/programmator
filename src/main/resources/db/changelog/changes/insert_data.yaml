@@ -6,3 +6,9 @@ databaseChangeLog:
         - sqlFile:
             path: classpath:db/changelog/changes/sql/users.sql
             encoding: UTF-8
+        - sqlFile:
+            path: classpath:db/changelog/changes/sql/roles.sql
+            encoding: UTF-8
+        - sqlFile:
+            path: classpath:db/changelog/changes/sql/user_roles.sql
+            encoding: UTF-8
