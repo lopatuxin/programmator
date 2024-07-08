@@ -22,21 +22,21 @@ class AuthControllerTest {
 
     @Test
     void when_register_than_success() throws Exception {
-
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"test@example.com\", \"phone\":\"1234567890\"}")
+                        .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"password\":\"password\", \"email\":\"test@example.com\", \"phone\":\"1234567890\"}")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.message").value("Пользователь успешно зарегистрирован"));
     }
 
+
     @Test
     void when_register_with_existing_email_than_badRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"anton@mail.ru\", \"phone\":\"1234567890\"}")
+                        .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"password\":\"password\", \"email\":\"anton@mail.ru\", \"phone\":\"1234567890\"}")
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Email уже зарегистрирован"));
@@ -46,7 +46,7 @@ class AuthControllerTest {
     void when_register_with_existing_phone_than_badRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\", \"password\":\"password\", \"email\":\"test@mail.ru\", \"phone\":\"+7(930) 175 67 42\"}")
+                        .content("{\"firstName\":\"Test\", \"lastName\":\"User\", \"password\":\"password\", \"email\":\"test1@example.com\", \"phone\":\"+7(930) 175 67 42\"}")
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Телефон уже зарегистрирован"));
@@ -58,7 +58,7 @@ class AuthControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"Антон\", \"password\":\"password\"}")
+                        .content("{\"email\":\"anton@mail.ru\", \"password\":\"password\"}")
                         .with(csrf()))
                 .andExpect(status().isOk());
     }
