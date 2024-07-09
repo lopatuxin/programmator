@@ -7,11 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +16,7 @@ import ru.programmator.dto.auth.AuthenticationResponse;
 import ru.programmator.dto.auth.LoginRequest;
 import ru.programmator.dto.auth.UserDTO;
 import ru.programmator.model.User;
-import ru.programmator.security.JwtTokenProvider;
+import ru.programmator.service.AuthService;
 import ru.programmator.service.UserService;
 
 @RestController
@@ -30,8 +25,7 @@ import ru.programmator.service.UserService;
 public class AuthController {
 
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
 
     @Operation(summary = "Register a new user", description = "Регистрация нового пользователя с предоставлением всех необходимых данных.")
     @ApiResponses(value = {
@@ -77,29 +71,18 @@ public class AuthController {
     })
     @PostMapping("/login")
     public BaseResponse<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtTokenProvider.createToken(authentication.getName(),
-                authentication.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList());
-
-        User user = userService.findByEmail(loginRequest.getEmail());
-
-        return BaseResponse.<AuthenticationResponse>builder()
-                .status(HttpStatus.OK)
-                .message("Пользователь успешно авторизован")
-                .data(AuthenticationResponse.builder()
-                        .token(token)
-                        .email(user.getEmail())
-                        .firstName(user.getFirstName())
-                        .build())
-                .build();
+        try {
+            AuthenticationResponse response = authService.authenticateUser(loginRequest);
+            return BaseResponse.<AuthenticationResponse>builder()
+                    .status(HttpStatus.OK)
+                    .message("Пользователь успешно авторизован")
+                    .data(response)
+                    .build();
+        } catch (Exception ex) {
+            return BaseResponse.<AuthenticationResponse>builder()
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .message("Неверный логин или пароль")
+                    .build();
+        }
     }
 }
